@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	bluekern "github.com/edumaxsantos/bluekern"
 	"github.com/tarm/serial"
 	"log"
 	"time"
@@ -34,7 +35,7 @@ type model struct {
 
 type responseMsg struct {
 	bytes   []byte
-	message Message
+	message bluekern.Message
 }
 
 type portsLoaded struct {
@@ -62,30 +63,23 @@ func mainUpdate(m model) (model, tea.Cmd) {
 
 	var statusCmd tea.Cmd
 
-	pin, err := GetPin(m.currentPin)
+	message, err := bluekern.CreateMessage(&bluekern.Builder{
+		Version: VERSION,
+		IO:      bluekern.Output,
+		Pin:     m.currentPin,
+		RW:      bluekern.Read,
+		Data:    []byte(selectedItem.Value()),
+	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	message := Message{
-		STX:     STX,
-		Version: VERSION,
-		IO:      Output,
-		Pin:     byte(pin),
-		RW:      Read,
-		Length:  0x03,
-		Data:    []byte(selectedItem.Value()),
-		ETX:     ETX,
-	}
-
 	message.Length = byte(len(message.Data))
 
 	if selectedItem.value == "1" || selectedItem.value == "0" {
-		message.RW = Write
+		message.RW = bluekern.Write
 	}
-
-	message.Checksum = calculateChecksum(message.checksumData())
 
 	log.Printf("Bytes to be sent %+v\n", message)
 	bytes := message.Encode()

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	tea "github.com/charmbracelet/bubbletea"
+	bluekern "github.com/edumaxsantos/bluekern"
 	"github.com/tarm/serial"
 	serialV1 "go.bug.st/serial.v1"
 	"log"
@@ -49,7 +50,7 @@ func WaitForData(sub chan []byte) tea.Cmd {
 
 		log.Println("Got a message from the channel")
 
-		message, err := Decode(value)
+		message, err := bluekern.Decode(value)
 		if err != nil {
 			log.Fatalf("We got error: %s. Value is: %x\nIn string: %s\n", err, value, string(value))
 		}
