@@ -20,21 +20,6 @@ func GetLedStatus(s []byte) string {
 	return ""
 }
 
-type screen int
-
-const (
-	PortSelection screen = iota
-	Main
-)
-
-type view int
-
-const (
-	TextView view = iota
-	ListView
-	NotSetView
-)
-
 func main() {
 	f, err := tea.LogToFile("debug.log", "debug")
 	if err != nil {

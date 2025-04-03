@@ -22,6 +22,21 @@ func (i item) Description() string { return i.desc }
 func (i item) FilterValue() string { return i.title }
 func (i item) Value() string       { return i.value }
 
+type screen int
+
+const (
+	PortSelection screen = iota
+	Main
+)
+
+type view int
+
+const (
+	TextView view = iota
+	ListView
+	NotSetView
+)
+
 type model struct {
 	list          list.Model
 	stream        *serial.Port
@@ -60,6 +75,12 @@ func portSelectionUpdate(m model) (model, tea.Cmd) {
 func mainUpdate(m model) (model, tea.Cmd) {
 	m.list.StatusMessageLifetime = time.Second
 	selectedItem := m.list.SelectedItem().(item)
+
+	log.Printf("Selected item: %v\n", selectedItem)
+
+	if selectedItem.value == "3" {
+		return m, tea.Quit
+	}
 
 	var statusCmd tea.Cmd
 
@@ -203,6 +224,7 @@ func initModel() model {
 		item{title: "ON", desc: "Turn LED ON", value: "1"},
 		item{title: "OFF", desc: "Turn LED OFF", value: "0"},
 		item{title: "Retrieve", desc: "Get current LED bytes", value: "2"},
+		item{title: "Dim", desc: "Dim the LED", value: "3"},
 	}
 	ti := textinput.New()
 	ti.Placeholder = "Port to access"
